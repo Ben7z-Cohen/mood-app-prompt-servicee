@@ -1,0 +1,32 @@
+name: Deploy to AWS
+
+on:
+  push:
+    branches:
+      - main  # Adjust the branch name as needed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'  # Adjust the Node.js version as needed
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Deploy to AWS
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}  # Use the secret from GitHub
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  # Use the secret from GitHub
+          AWS_REGION: ${{ secrets.AWS_REGION }}  # Optional: Specify your AWS region
+          SECRET_NAME: ${{ secrets.SECRET_NAME }}  # Use the secret from GitHub
+          PROMPT_EP: ${{ secrets.PROMPT_EP }}
+        run: |
+          npx serverless deploy --stage prod  

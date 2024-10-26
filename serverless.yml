@@ -1,0 +1,69 @@
+service: mood-app-prompt-service
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: us-east-1
+  environment:
+    SECRET_NAME: "${env:SECRET_NAME}" # ARN for Secrets Manager
+    CONTEXT_DYNAMO_TABLE_NAME: !Sub "{{resolve:secretsmanager:${SECRET_NAME}::CONTEXT_DYNAMO_TABLE_NAME}}"
+    SUMMARY_DYNAMO_TABLE_NAME: !Sub "{{resolve:secretsmanager:${SECRET_NAME}::SUMMARY_DYNAMO_TABLE_NAME}}"
+    PROMPT_EP: "${env:PROMPT_EP}"
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - secretsmanager:GetSecretValue
+      Resource: "${env:SECRET_NAME}" # Allow access to the Secrets Manager ARN
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:PutItem
+        - dynamodb:GetItem
+        - dynamodb:Scan
+        - dynamodb:UpdateItem
+      Resource: 
+        - "arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/${self:provider.environment.CONTEXT_DYNAMO_TABLE_NAME}"  
+        - "arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/${self:provider.environment.SUMMARY_DYNAMO_TABLE_NAME}"  
+
+functions:
+  prompt:
+    handler: src/prompt.handler
+    events:
+      - http:
+          method: post
+          path: prompt
+          cors: true
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              Ref: CognitoUserPoolClient # Reference to the Cognito User Pool Client
+            identitySource: "method.request.header.Authorization"
+
+resources:
+  Resources:
+    CognitoUserPool:
+      Type: AWS::Cognito::UserPool
+      Properties:
+        UserPoolName: !Sub "${SECRET_NAME}::USER_POOL_NAME" # Get from Secrets Manager
+
+    CognitoUserPoolClient:
+      Type: AWS::Cognito::UserPoolClient
+      Properties:
+        UserPoolId:
+          Ref: CognitoUserPool # Reference to the Cognito User Pool
+        ClientName: !Sub "${SECRET_NAME}::CLIENT_NAME" # Get from Secrets Manager
+        GenerateSecret: false
+
+    CognitoUserPoolAuthorizer:
+      Type: AWS::ApiGateway::Authorizer
+      Properties:
+        Name: CognitoAuthorizer
+        Type: COGNITO_USER_POOLS
+        RestApiId: !Ref ApiGatewayRestApi
+        IdentitySource: "method.request.header.Authorization"
+        ProviderARNs:
+          - !GetAtt CognitoUserPool.Arn # Get the ARN of the Cognito User Pool
+
+plugins:
+  - serverless-offline
