@@ -42,5 +42,6 @@ jobs:
           AWS_REGION: ${{ secrets.AWS_REGION }}  # Optional: Specify your AWS region
           SECRET_NAME: ${{ secrets.SECRET_NAME }}  # Use the secret from GitHub
           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+          PROMPT_EP: ${{secrets.PROMPT_EP}}
         run: |
           npx serverless@3.39.0 deploy --verbose
