@@ -3,6 +3,7 @@ service: mood-app-prompt-service
 provider:
   name: aws
   runtime: nodejs18.x
+  stage: prod
   region: us-east-1
   environment:
     SECRET_NAME: "${env:SECRET_NAME}" # ARN for Secrets Manager

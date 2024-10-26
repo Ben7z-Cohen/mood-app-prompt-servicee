@@ -20,7 +20,13 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-
+      - name: Verify AWS Connection
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+        run: |
+          aws s3 ls  # This command lists your S3 buckets to verify connection
 
       - name: Deploy to AWS
         env:
