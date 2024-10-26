@@ -7,8 +7,8 @@ provider:
   region: us-east-1
   environment:
     SECRET_NAME: "${env:SECRET_NAME}" # ARN for Secrets Manager
-    CONTEXT_DYNAMO_TABLE_NAME: !Sub "{{resolve:secretsmanager:${SECRET_NAME}::CONTEXT_DYNAMO_TABLE_NAME}}"
-    SUMMARY_DYNAMO_TABLE_NAME: !Sub "{{resolve:secretsmanager:${SECRET_NAME}::SUMMARY_DYNAMO_TABLE_NAME}}"
+    CONTEXT_DYNAMO_TABLE_NAME:  "{{resolve:secretsmanager:${SECRET_NAME}::CONTEXT_DYNAMO_TABLE_NAME}}"
+    SUMMARY_DYNAMO_TABLE_NAME:  "{{resolve:secretsmanager:${SECRET_NAME}::SUMMARY_DYNAMO_TABLE_NAME}}"
     PROMPT_EP: "${env:PROMPT_EP}"
 
   iamRoleStatements:
