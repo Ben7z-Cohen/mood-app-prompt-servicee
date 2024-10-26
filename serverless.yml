@@ -1,21 +1,21 @@
 service: mood-app-prompt-service
-
+frameworkVersion: '3'
 provider:
   name: aws
   runtime: nodejs20.x
   stage: prod
   region: us-east-1
   environment:
-    SECRET_NAME: "${env:SECRET_NAME}" # ARN for Secrets Manager
-    CONTEXT_DYNAMO_TABLE_NAME:  "${env:CONTEXT_DYNAMO_TABLE_NAME}"
-    SUMMARY_DYNAMO_TABLE_NAME:  "${env:SUMMARY_DYNAMO_TABLE_NAME}"
-    PROMPT_EP: "${env:PROMPT_EP}"
+      SECRET_NAME: "${env:SECRET_NAME}"  # ARN for Secrets Manager
+      CONTEXT_DYNAMO_TABLE_NAME: "${env:CONTEXT_DYNAMO_TABLE_NAME}"
+      SUMMARY_DYNAMO_TABLE_NAME: "${env:SUMMARY_DYNAMO_TABLE_NAME}"
+      COGNITO_USER_POOL_ID: "${env:USER_POOL_ID}"       # Replace with the correct parameter name
 
   iamRoleStatements:
     - Effect: Allow
       Action:
         - secretsmanager:GetSecretValue
-      Resource: "${env:SECRET_NAME}" # Allow access to the Secrets Manager ARN
+      Resource: "${env:SECRET_NAME}"  # Allow access to the Secrets Manager ARN
     - Effect: Allow
       Action:
         - dynamodb:Query
@@ -23,9 +23,9 @@ provider:
         - dynamodb:GetItem
         - dynamodb:Scan
         - dynamodb:UpdateItem
-      Resource: 
-        - "arn:aws:dynamodb:${self:provider.region}:${env:AWS_ACCOUNT_ID}:table/${self:provider.environment.CONTEXT_DYNAMO_TABLE_NAME}"  
-        - "arn:aws:dynamodb:${self:provider.region}:${env:AWS_ACCOUNT_ID}:table/${self:provider.environment.SUMMARY_DYNAMO_TABLE_NAME}"  
+      Resource:
+        - "arn:aws:dynamodb:${self:provider.region}:${env:AWS_ACCOUNT_ID}:table/${self:provider.environment.CONTEXT_DYNAMO_TABLE_NAME}"
+        - "arn:aws:dynamodb:${self:provider.region}:${env:AWS_ACCOUNT_ID}:table/${self:provider.environment.SUMMARY_DYNAMO_TABLE_NAME}"
 
 functions:
   prompt:
@@ -37,34 +37,8 @@ functions:
           cors: true
           authorizer:
             type: COGNITO_USER_POOLS
-            authorizerId:
-              Ref: CognitoUserPoolClient # Reference to the Cognito User Pool Client
+            arn: "arn:aws:cognito-idp:${self:provider.region}:${env:AWS_ACCOUNT_ID}:userpool/${self:provider.environment.COGNITO_USER_POOL_ID}"
             identitySource: "method.request.header.Authorization"
-
-resources:
-  Resources:
-    CognitoUserPool:
-      Type: AWS::Cognito::UserPool
-      Properties:
-        UserPoolName: !Sub "${SECRET_NAME}::USER_POOL_NAME" # Get from Secrets Manager
-
-    CognitoUserPoolClient:
-      Type: AWS::Cognito::UserPoolClient
-      Properties:
-        UserPoolId:
-          Ref: CognitoUserPool # Reference to the Cognito User Pool
-        ClientName: !Sub "${SECRET_NAME}::CLIENT_NAME" # Get from Secrets Manager
-        GenerateSecret: false
-
-    CognitoUserPoolAuthorizer:
-      Type: AWS::ApiGateway::Authorizer
-      Properties:
-        Name: CognitoAuthorizer
-        Type: COGNITO_USER_POOLS
-        RestApiId: !Ref ApiGatewayRestApi
-        IdentitySource: "method.request.header.Authorization"
-        ProviderARNs:
-          - !GetAtt CognitoUserPool.Arn # Get the ARN of the Cognito User Pool
 
 plugins:
   - serverless-offline
