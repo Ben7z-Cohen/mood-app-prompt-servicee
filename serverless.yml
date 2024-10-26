@@ -9,7 +9,8 @@ provider:
       SECRET_NAME: "${env:SECRET_NAME}"  # ARN for Secrets Manager
       CONTEXT_DYNAMO_TABLE_NAME: "${env:CONTEXT_DYNAMO_TABLE_NAME}"
       SUMMARY_DYNAMO_TABLE_NAME: "${env:SUMMARY_DYNAMO_TABLE_NAME}"
-      COGNITO_USER_POOL_ID: "${env:USER_POOL_ID}"       # Replace with the correct parameter name
+      COGNITO_USER_POOL_ID: "${env:COGNITO_USER_POOL_ID}"       # Replace with the correct parameter name
+      PROMPT_EP: "${env:PROMPT_EP}"
 
   iamRoleStatements:
     - Effect: Allow
