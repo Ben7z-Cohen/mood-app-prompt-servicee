@@ -2,7 +2,7 @@ service: mood-app-prompt-service
 
 provider:
   name: aws
-  runtime: nodejs18.x
+  runtime: nodejs20.x
   stage: prod
   region: us-east-1
   environment:
