@@ -24,8 +24,8 @@ provider:
         - dynamodb:Scan
         - dynamodb:UpdateItem
       Resource: 
-        - "arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/${self:provider.environment.CONTEXT_DYNAMO_TABLE_NAME}"  
-        - "arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/${self:provider.environment.SUMMARY_DYNAMO_TABLE_NAME}"  
+        - "arn:aws:dynamodb:${self:provider.region}:${env:AWS_ACCOUNT_ID}:table/${self:provider.environment.CONTEXT_DYNAMO_TABLE_NAME}"  
+        - "arn:aws:dynamodb:${self:provider.region}:${env:AWS_ACCOUNT_ID}:table/${self:provider.environment.SUMMARY_DYNAMO_TABLE_NAME}"  
 
 functions:
   prompt:
