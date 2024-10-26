@@ -40,6 +40,9 @@ functions:
             type: COGNITO_USER_POOLS
             arn: "arn:aws:cognito-idp:${self:provider.region}:${env:AWS_ACCOUNT_ID}:userpool/${self:provider.environment.COGNITO_USER_POOL_ID}"
             identitySource: "method.request.header.Authorization"
+custom:
+  serverlessPluginTypescript:
+    tsConfigFileLocation: './tsconfig.build.json'
 
 plugins:
   - serverless-offline

@@ -1,19 +1,15 @@
 {
     "compilerOptions": {
-        "target": "es2020",
-        "strict": true,
         "preserveConstEnums": true,
-        "noEmit": true,
-        "sourceMap": false,
-        "module": "commonjs",
+        "strictNullChecks": true,
+        "sourceMap": true,
+        "allowJs": true,
+        "target": "es5",
+        "outDir": ".build",
         "moduleResolution": "node",
-        "esModuleInterop": true,
-        "skipLibCheck": true,
-        "forceConsistentCasingInFileNames": true,
-        "isolatedModules": true,
-    },
-    "exclude": [
-        "node_modules",
-        "**/*.test.ts"
-    ]
+        "lib": [
+            "es2015"
+        ],
+        "rootDir": "./src"
+    }
 }
