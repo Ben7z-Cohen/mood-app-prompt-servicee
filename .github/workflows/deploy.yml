@@ -43,5 +43,7 @@ jobs:
           SECRET_NAME: ${{ secrets.SECRET_NAME }}  # Use the secret from GitHub
           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
           PROMPT_EP: ${{secrets.PROMPT_EP}}
+          SUMMARY_DYNAMO_TABLE_NAME: ${{secrets.SUMMARY_DYNAMO_TABLE_NAME}}
+          CONTEXT_DYNAMO_TABLE_NAME: ${{secrets.CONTEXT_DYNAMO_TABLE_NAME}}
         run: |
           npx serverless@3.39.0 deploy --verbose
